@@ -1,0 +1,15 @@
+C:\Users\vishn\source\repos\Gana\Url-shortener\src\UrlShortener.Application\bin\Debug\net10.0\UrlShortener.Application.deps.json
+C:\Users\vishn\source\repos\Gana\Url-shortener\src\UrlShortener.Application\bin\Debug\net10.0\UrlShortener.Application.dll
+C:\Users\vishn\source\repos\Gana\Url-shortener\src\UrlShortener.Application\bin\Debug\net10.0\UrlShortener.Application.pdb
+C:\Users\vishn\source\repos\Gana\Url-shortener\src\UrlShortener.Application\bin\Debug\net10.0\UrlShortener.Domain.dll
+C:\Users\vishn\source\repos\Gana\Url-shortener\src\UrlShortener.Application\bin\Debug\net10.0\UrlShortener.Domain.pdb
+C:\Users\vishn\source\repos\Gana\Url-shortener\src\UrlShortener.Application\obj\Debug\net10.0\UrlShortener.Application.csproj.AssemblyReference.cache
+C:\Users\vishn\source\repos\Gana\Url-shortener\src\UrlShortener.Application\obj\Debug\net10.0\UrlShortener.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\vishn\source\repos\Gana\Url-shortener\src\UrlShortener.Application\obj\Debug\net10.0\UrlShortener.Application.AssemblyInfoInputs.cache
+C:\Users\vishn\source\repos\Gana\Url-shortener\src\UrlShortener.Application\obj\Debug\net10.0\UrlShortener.Application.AssemblyInfo.cs
+C:\Users\vishn\source\repos\Gana\Url-shortener\src\UrlShortener.Application\obj\Debug\net10.0\UrlShortener.Application.csproj.CoreCompileInputs.cache
+C:\Users\vishn\source\repos\Gana\Url-shortener\src\UrlShortener.Application\obj\Debug\net10.0\UrlShort.95A5A48A.Up2Date
+C:\Users\vishn\source\repos\Gana\Url-shortener\src\UrlShortener.Application\obj\Debug\net10.0\UrlShortener.Application.dll
+C:\Users\vishn\source\repos\Gana\Url-shortener\src\UrlShortener.Application\obj\Debug\net10.0\refint\UrlShortener.Application.dll
+C:\Users\vishn\source\repos\Gana\Url-shortener\src\UrlShortener.Application\obj\Debug\net10.0\UrlShortener.Application.pdb
+C:\Users\vishn\source\repos\Gana\Url-shortener\src\UrlShortener.Application\obj\Debug\net10.0\ref\UrlShortener.Application.dll
