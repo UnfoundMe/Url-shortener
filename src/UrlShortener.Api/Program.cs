@@ -1,41 +1,103 @@
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.OpenApi;
+using UrlShortener.Api.Middleware;
+using UrlShortener.Application;
+using UrlShortener.Infrastructure;
+using UrlShortener.Infrastructure.Persistence;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddControllers();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "URL Shortener API",
+        Version = "v1",
+        Description = "Creates shortened URLs and redirects short codes to their original destination.",
+    });
+});
+
+builder.Services.AddApplication(builder.Configuration);
+builder.Services.AddInfrastructure(builder.Configuration);
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Configuration.GetValue("Database:ApplyMigrationsOnStartup", true))
 {
-    app.MapOpenApi();
+    await ApplyMigrationsWithRetryAsync(app.Services, app.Logger);
 }
 
-app.UseHttpsRedirection();
+app.UseExceptionHandler();
 
-var summaries = new[]
+if (app.Environment.IsDevelopment())
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "URL Shortener API v1");
+    });
+}
 
-app.MapGet("/weatherforecast", () =>
+app.MapControllers();
+
+// Liveness: the process is up and able to respond. No dependency checks.
+app.MapHealthChecks("/health/live", new HealthCheckOptions
 {
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+    Predicate = _ => false,
+});
+
+// Readiness: PostgreSQL failures make the service unready (503); Redis failures are reported
+// as Degraded and still return 200, since Redis is a soft dependency the service can run without.
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("ready"),
+    ResultStatusCodes =
+    {
+        [HealthStatus.Healthy] = StatusCodes.Status200OK,
+        [HealthStatus.Degraded] = StatusCodes.Status200OK,
+        [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable,
+    },
+});
 
 app.Run();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+/// <summary>
+/// Applies pending EF Core migrations on startup with a small bounded retry, since the database
+/// container may not yet be accepting connections the moment this service starts in Docker Compose.
+/// </summary>
+static async Task ApplyMigrationsWithRetryAsync(IServiceProvider services, ILogger logger)
 {
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    const int maxAttempts = 5;
+    var delay = TimeSpan.FromSeconds(2);
+
+    await using var scope = services.CreateAsyncScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<UrlShortenerDbContext>();
+
+    for (var attempt = 1; attempt <= maxAttempts; attempt++)
+    {
+        try
+        {
+            await dbContext.Database.MigrateAsync();
+            logger.LogInformation("Database migrations applied successfully.");
+            return;
+        }
+        catch (Exception ex) when (attempt < maxAttempts)
+        {
+            logger.LogWarning(ex, "Migration attempt {Attempt}/{MaxAttempts} failed; retrying in {Delay}s", attempt, maxAttempts, delay.TotalSeconds);
+            await Task.Delay(delay);
+        }
+    }
+}
+
+/// <summary>Exposed for <c>WebApplicationFactory&lt;Program&gt;</c> in integration tests.</summary>
+public partial class Program
+{
 }
