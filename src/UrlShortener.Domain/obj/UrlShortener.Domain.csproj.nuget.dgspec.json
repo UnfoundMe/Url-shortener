@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\vishn\\source\\repos\\Gana\\Url-shortener\\src\\UrlShortener.Domain\\UrlShortener.Domain.csproj": {}
+    "C:\\Users\\vishn\\source\\repos\\Gana\\Url-shortener-1\\src\\UrlShortener.Domain\\UrlShortener.Domain.csproj": {}
   },
   "projects": {
-    "C:\\Users\\vishn\\source\\repos\\Gana\\Url-shortener\\src\\UrlShortener.Domain\\UrlShortener.Domain.csproj": {
+    "C:\\Users\\vishn\\source\\repos\\Gana\\Url-shortener-1\\src\\UrlShortener.Domain\\UrlShortener.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\vishn\\source\\repos\\Gana\\Url-shortener\\src\\UrlShortener.Domain\\UrlShortener.Domain.csproj",
+        "projectUniqueName": "C:\\Users\\vishn\\source\\repos\\Gana\\Url-shortener-1\\src\\UrlShortener.Domain\\UrlShortener.Domain.csproj",
         "projectName": "UrlShortener.Domain",
-        "projectPath": "C:\\Users\\vishn\\source\\repos\\Gana\\Url-shortener\\src\\UrlShortener.Domain\\UrlShortener.Domain.csproj",
+        "projectPath": "C:\\Users\\vishn\\source\\repos\\Gana\\Url-shortener-1\\src\\UrlShortener.Domain\\UrlShortener.Domain.csproj",
         "packagesPath": "C:\\Users\\vishn\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\vishn\\source\\repos\\Gana\\Url-shortener\\src\\UrlShortener.Domain\\obj\\",
+        "outputPath": "C:\\Users\\vishn\\source\\repos\\Gana\\Url-shortener-1\\src\\UrlShortener.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

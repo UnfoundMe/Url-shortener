@@ -1,0 +1,68 @@
+URL Shortener
+=============
+
+A production-quality URL shortener built with .NET 10 / ASP.NET Core, following a clean,
+layered architecture (API -> Application -> Domain, with Infrastructure implementing
+Application/Domain abstractions).
+
+Projects
+--------
+- src/UrlShortener.Domain          Core entity (ShortenedUrl) and business invariants. No
+                                    framework dependencies.
+- src/UrlShortener.Application     Use cases, DTOs, validation, and abstractions
+                                    (IShortenedUrlRepository, IShortUrlCache, IShortCodeGenerator).
+- src/UrlShortener.Infrastructure  EF Core + PostgreSQL persistence, Redis cache-aside,
+                                    Base62 short-code generation, health checks, migrations.
+- src/UrlShortener.Api             ASP.NET Core Web API: controllers, DI composition root,
+                                    global exception handling, Swagger, health check endpoints.
+- tests/UrlShortener.UnitTests     xUnit unit tests (validation, short-code generation,
+                                    service behavior with mocks, architecture/dependency checks).
+- tests/UrlShortener.IntegrationTests
+                                    xUnit integration/E2E tests against real PostgreSQL and
+                                    Redis containers via Testcontainers.
+
+API
+---
+- POST /api/urls              Create a shortened URL. Body: { "url": "https://..." }.
+                               Returns 201 with the short code / short URL. Not idempotent -
+                               repeated calls for the same URL produce different short codes.
+- GET  /{shortCode}            Redirect to the original URL (default: 302 Found, configurable).
+                               Returns 404 if the short code does not exist.
+- GET  /health/live             Liveness probe (process is up).
+- GET  /health/ready             Readiness probe. PostgreSQL failures return 503; Redis
+                                 failures are reported as Degraded and still return 200,
+                                 since Redis is a soft dependency.
+- /swagger                     Interactive API docs (Development environment only).
+
+Running locally with Docker Compose
+------------------------------------
+    docker compose up --build
+
+This starts PostgreSQL, Redis, and the API (http://localhost:8080). Database migrations are
+applied automatically on startup.
+
+Running locally without Docker
+-------------------------------
+1. Start PostgreSQL and Redis (e.g. via `docker compose up postgres redis`).
+2. Update src/UrlShortener.Api/appsettings.Development.json connection strings if needed.
+3. dotnet run --project src/UrlShortener.Api
+
+Configuration
+--------------
+See appsettings.json. Key settings:
+- ConnectionStrings:Postgres / ConnectionStrings:Redis
+- UrlShortener:ShortCodeLength, MaxCollisionRetries, MaxUrlLength, RedirectStatusCode
+- Cache:TtlHours, NegativeTtlSeconds, ConnectTimeoutMs, OperationTimeoutMs
+- Database:ApplyMigrationsOnStartup (default true)
+
+Tests
+-----
+    dotnet test tests/UrlShortener.UnitTests
+    dotnet test tests/UrlShortener.IntegrationTests   # requires Docker (Testcontainers)
+
+Database migrations
+--------------------
+    dotnet ef migrations add <Name> \
+      --project src/UrlShortener.Infrastructure/UrlShortener.Infrastructure.csproj \
+      --startup-project src/UrlShortener.Api/UrlShortener.Api.csproj \
+      --output-dir Persistence/Migrations
